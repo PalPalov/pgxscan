@@ -2,22 +2,24 @@ package pgxscan
 
 import (
 	"errors"
-	"fmt"
 	"reflect"
 )
 
 // create fields
-func CreateFields(val any) ([]string, error) {
+func CreateFields(val any) (map[string]any, error) {
+	t := reflect.TypeOf(val)
 	v := reflect.ValueOf(val)
-	if v.Kind() != reflect.Struct {
+	if t.Kind() != reflect.Struct {
 		return nil, errors.New("Неверный тип данных")
 	}
-
-	for i := 0; i < v.NumField(); i++ {
-		fv := v.Field(i)
-		fv.Type().Field(i).tag
+	res := map[string]any{}
+	for i := 0; i < t.NumField(); i++ {
+		ft := t.Field(i)
+		if vl, ok := ft.Tag.Lookup("db"); ok {
+			if vl != "" {
+				res[vl] = v.Addr().Interface()
+			}
+		}
 	}
-
-	fmt.Println(v.Kind())
-	return nil, nil
+	return res, nil
 }
