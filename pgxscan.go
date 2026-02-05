@@ -1,10 +1,12 @@
 package pgxscan
 
 import (
+	"context"
 	"fmt"
 	"time"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 // ["map[bigint:2 byte:<nil> char:4 date:2026-02-05 00:00:00 +0000 UTC id:1 int:1 intarr:[1 2 3] json:map[ggg:rrrr] jsonb:map[ggg:rrrr] smallint:3 text:texttest time:2026-02-05 00:29:06.031303 +0000 UTC varchar:3]"]
@@ -56,6 +58,14 @@ func Scan[T any](row pgx.Rows) ([]T, error) {
 	return res, nil
 }
 
-func ScanRows(rows pgx.Row, val []any) {
-
+func Query[T any](pgpool *pgxpool.Pool, sql string, args ...any) ([]T, error) {
+	rw, err := pgpool.Query(context.Background(), sql, args...)
+	if err != nil {
+		return nil, err
+	}
+	res, err := Scan[T](rw)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
 }
