@@ -1,4 +1,4 @@
-module pgxscan
+module github.com/PalPalov/pgxscan
 
 go 1.24.0
 

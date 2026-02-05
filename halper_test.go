@@ -2,10 +2,10 @@ package pgxscan_test
 
 import (
 	"fmt"
-	"pgxscan"
 	"reflect"
 	"testing"
 
+	"github.com/PalPalov/pgxscan"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
