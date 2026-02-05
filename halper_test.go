@@ -49,16 +49,18 @@ func TestCreateFields(t *testing.T) {
 		t.Error(err.Error())
 	}
 	fmt.Println(ft)
-	// ft := FieldTest{}
-	// flist, err := pgxscan.CreateFields(ft)
-	// if err != nil {
-	// 	t.Error("Неверный возврат")
-	// }
+}
 
-	// if !slices.Equal(flist, fields) {
-	// 	t.Errorf("Неверное значение возврата функции %v", flist)
-	// }
-
+func TestQuery(t *testing.T) {
+	pool, err := pgxpool.New(t.Context(), connstring)
+	if err != nil {
+		t.Error("Ошибка подключения к бд")
+	}
+	rw, err := pgxscan.Query[FieldTest](pool, "select * from rqts")
+	if err != nil {
+		t.Error(err.Error())
+	}
+	fmt.Println(rw)
 }
 
 type MyStruct struct {
