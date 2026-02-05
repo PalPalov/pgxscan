@@ -49,26 +49,10 @@ func Scan[T any](row pgx.Rows) ([]T, error) {
 				default:
 					return nil, fmt.Errorf("Неизвестный формат данных")
 				}
-
 			}
 		}
 		res = append(res, val)
 	}
-	// //rowmap, err := pgx.RowToMap(row)
-	// f, err := CreateFields(val)
-	// if err != nil {
-	// 	return err
-	// }
-	// values, err := r.Values()
-	// if err != nil {
-	// 	return err
-	// }
-	// for i, rv := range r.FieldDescriptions() {
-	// 	_, ok := f[rv.Name]
-	// 	if ok {
-	// 		f[rv.Name] = values[i]
-	// 	}
-	// }
 	return res, nil
 }
 
