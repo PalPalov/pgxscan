@@ -12,7 +12,7 @@ import (
 
 var cn *pgxpool.Pool = nil
 
-// Инициализация подключения
+// init
 func InitConnection(connectionstring string) error {
 	var err error = nil
 	cn, err = pgxpool.New(context.Background(), connectionstring)
@@ -22,7 +22,7 @@ func InitConnection(connectionstring string) error {
 	return err
 }
 
-// Сканирование запроса
+// scan
 func Scan[T any](sql string, args ...any) ([]T, error) {
 	if cn == nil {
 		return nil, errors.New("pool is not initialized")
@@ -38,7 +38,6 @@ func Scan[T any](sql string, args ...any) ([]T, error) {
 	return res, nil
 }
 
-// ["map[bigint:2 byte:<nil> char:4 date:2026-02-05 00:00:00 +0000 UTC id:1 int:1 intarr:[1 2 3] json:map[ggg:rrrr] jsonb:map[ggg:rrrr] smallint:3 text:texttest time:2026-02-05 00:29:06.031303 +0000 UTC varchar:3]"]
 // integer - int32
 // biginteger - int64
 // timestamp wotz - time.Time
@@ -97,4 +96,22 @@ func Query[T any](pgpool *pgxpool.Pool, sql string, args ...any) ([]T, error) {
 		return nil, err
 	}
 	return res, nil
+}
+
+func Insert(sql string, args ...any) (any, error) {
+	rw := cn.QueryRow(context.Background(), sql, args...)
+	var res any
+	err := rw.Scan(&res)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func Update(sql string, args ...any) error {
+	_, err := cn.Exec(context.Background(), sql, args...)
+	if err != nil {
+		return err
+	}
+	return nil
 }

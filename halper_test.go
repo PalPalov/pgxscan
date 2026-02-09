@@ -2,7 +2,6 @@ package pgxscan_test
 
 import (
 	"fmt"
-	"reflect"
 	"testing"
 	"time"
 
@@ -41,7 +40,6 @@ func TestModule(t *testing.T) {
 	if err != nil {
 		t.Error((err.Error()))
 	}
-
 	fmt.Println(ft)
 }
 
@@ -62,21 +60,4 @@ func TestQuery(t *testing.T) {
 
 type MyStruct struct {
 	Id int
-}
-
-func TestF(tst *testing.T) {
-	ms := &MyStruct{}
-	//t := reflect.TypeOf(ms)
-	v := reflect.ValueOf(ms).Elem()
-	for i := 0; i < v.NumField(); i++ {
-
-		field := v.Field(i)
-		if field.CanAddr() {
-			vl := field.Addr().Interface()
-			vlp := vl.(*int)
-			*vlp = 10
-			fmt.Print(vl)
-		}
-	}
-	fmt.Print(ms)
 }
