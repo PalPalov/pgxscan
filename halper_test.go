@@ -58,6 +58,11 @@ func TestQuery(t *testing.T) {
 	fmt.Println(rw)
 }
 
-type MyStruct struct {
-	Id int
+func TestInsert(t *testing.T) {
+	pgxscan.InitConnection(connstring)
+	id, err := pgxscan.Insert("INSERT INTO public.rqts(hostname, username) VALUES ($1, $2) returning id", "hostname", "username")
+	if err != nil {
+		t.Error(err.Error())
+	}
+	fmt.Println(id)
 }
