@@ -2,12 +2,41 @@ package pgxscan
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
+
+var cn *pgxpool.Pool = nil
+
+// Инициализация подключения
+func InitConnection(connectionstring string) error {
+	var err error = nil
+	cn, err = pgxpool.New(context.Background(), connectionstring)
+	if err != nil {
+		fmt.Println("Ошибка подключения к бд")
+	}
+	return err
+}
+
+// Сканирование запроса
+func Scan[T any](sql string, args ...any) ([]T, error) {
+	if cn == nil {
+		return nil, errors.New("pool is not initialized")
+	}
+	rw, err := cn.Query(context.Background(), sql, args...)
+	if err != nil {
+		return nil, err
+	}
+	res, err := ScanRows[T](rw)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
 
 // ["map[bigint:2 byte:<nil> char:4 date:2026-02-05 00:00:00 +0000 UTC id:1 int:1 intarr:[1 2 3] json:map[ggg:rrrr] jsonb:map[ggg:rrrr] smallint:3 text:texttest time:2026-02-05 00:29:06.031303 +0000 UTC varchar:3]"]
 // integer - int32
@@ -24,7 +53,7 @@ import (
 // json - map[string]interface{}
 // integer[] - []interface{}
 
-func Scan[T any](row pgx.Rows) ([]T, error) {
+func ScanRows[T any](row pgx.Rows) ([]T, error) {
 	val := *new(T)
 	f, err := CreateFields(&val)
 	if err != nil {
@@ -63,7 +92,7 @@ func Query[T any](pgpool *pgxpool.Pool, sql string, args ...any) ([]T, error) {
 	if err != nil {
 		return nil, err
 	}
-	res, err := Scan[T](rw)
+	res, err := ScanRows[T](rw)
 	if err != nil {
 		return nil, err
 	}

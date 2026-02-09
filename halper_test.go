@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/PalPalov/pgxscan"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -33,33 +34,29 @@ type TestStruct struct {
 
 const connstring = "postgres://masteruser:GfHtrj&6g@10.0.3.78:5432/mng_data"
 
-func TestCreateFields(t *testing.T) {
-	pool, err := pgxpool.New(t.Context(), connstring)
+func TestModule(t *testing.T) {
+
+	pgxscan.InitConnection(connstring)
+	ft, err := pgxscan.Scan[FieldTest]("select * from rqts")
 	if err != nil {
-		t.Error("Ошибка подключения к бд")
+		t.Error((err.Error()))
 	}
-	rw, err := pool.Query(t.Context(), "select * from rqts")
-	if err != nil {
-		t.Error(err.Error())
-	}
-	//rr := &rw
-	//ft := FieldTest{}
-	ft, err := pgxscan.Scan[FieldTest](rw)
-	if err != nil {
-		t.Error(err.Error())
-	}
+
 	fmt.Println(ft)
 }
 
 func TestQuery(t *testing.T) {
+	dt := time.Now()
 	pool, err := pgxpool.New(t.Context(), connstring)
 	if err != nil {
 		t.Error("Ошибка подключения к бд")
 	}
-	rw, err := pgxscan.Query[FieldTest](pool, "select * from rqts")
+	fmt.Println(time.Since(dt))
+	rw, err := pgxscan.Query[FieldTest](pool, "select * from rqts limit 10")
 	if err != nil {
 		t.Error(err.Error())
 	}
+	fmt.Println(time.Since(dt))
 	fmt.Println(rw)
 }
 
